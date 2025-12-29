@@ -68,25 +68,20 @@ def update_dns_record(record_id, name, cf_ip):
             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + " ---- MESSAGE: " + str(response))
         return "ip:" + str(cf_ip) + "解析" + str(name) + "失败"
 
+# 换成企业微信推送（完全免费，无需实名）
 def push_plus(content):
-    # 使用 WxPusher 的公共推送接口
-    uid = os.environ.get("WXPUSHER_UID", "")
-    if not uid:
-        print("⚠️ 未配置 WXPUSHER_UID")
-        return
-
-    url = 'https://wxpusher.zjiecode.com/api/send/message'
+    # 这里填你刚才复制的那个 Webhook 地址
+    url = '这里填你刚才复制的Webhook地址' 
     data = {
-        "appToken": "AT_6nF364K6N26Bf4Sj0Y9Y8M6j8I8I8I8I", # 这是一个公用测试 Token
-        "content": content,
-        "summary": "IP优选更新提醒", # 手机弹窗看到的简略内容
-        "contentType": 1, 
-        "uids": [uid]
+        "msgtype": "markdown",
+        "markdown": {
+            "content": f"### IP优选DNSCF推送\n{content}"
+        }
     }
-    
+    headers = {'Content-Type': 'application/json'}
     try:
-        res = requests.post(url, json=data)
-        print(f"🔔 微信推送结果: {res.json()}")
+        response = requests.post(url, json=data, headers=headers)
+        print(f"🔔 企业微信推送结果: {response.json()}")
     except Exception as e:
         print(f"❌ 推送出错: {e}")
 
