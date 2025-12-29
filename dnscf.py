@@ -84,24 +84,33 @@ def push_plus(content):
 
 # 主函数
 def main():
-    # 获取最新优选IP
+    # 1. 获取最新优选IP
     ip_addresses_str = get_cf_speed_test_ip()
+    if not ip_addresses_str:
+        print("❌ 无法获取优选IP，请检查网络或数据源。")
+        return
     ip_addresses = ip_addresses_str.split(',')
+
+    # 2. 获取 DNS 记录（必须先执行这一步，产生 dns_records 变量）
+    dns_records = get_dns_records(CF_DNS_NAME)
+
+    # 3. 检查记录是否存在（这就是你想要添加的防御代码，注意缩进！）
     if not dns_records:
         print(f"❌ 错误：在 Cloudflare 中没找到域名 {CF_DNS_NAME} 的记录！")
         print("请检查：1. Cloudflare是否有该记录  2. Secrets里的域名是否填错")
         import sys
-        sys.exit(0) # 优雅退出，不让 Actions 变红
-# -------------------------
-    dns_records = get_dns_records(CF_DNS_NAME)
-    push_plus_content = []
-    # 遍历 IP 地址列表
-    for index, ip_address in enumerate(ip_addresses):
-        # 执行 DNS 变更
-        dns = update_dns_record(dns_records[index], CF_DNS_NAME, ip_address)
-        push_plus_content.append(dns)
+        sys.exit(0) # 优雅退出
 
-    push_plus('\n'.join(push_plus_content))
+    push_plus_content = []
+    # 4. 遍历 IP 地址列表并更新
+    for index, ip_address in enumerate(ip_addresses):
+        # 增加判断，防止优选IP数量多于你的解析记录数量导致越界
+        if index < len(dns_records):
+            dns = update_dns_record(dns_records[index], CF_DNS_NAME, ip_address)
+            push_plus_content.append(dns)
+
+    if push_plus_content:
+        push_plus('\n'.join(push_plus_content))
 
 if __name__ == '__main__':
     main()
