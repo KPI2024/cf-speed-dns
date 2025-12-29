@@ -1,3 +1,5 @@
+# 在 main() 函数的第一行加入：
+print(f"调试：Webhook变量是否存在: {'QY_WEBHOOK' in os.environ}")
 import requests
 import os
 import json
