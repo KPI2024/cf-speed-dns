@@ -35,18 +35,17 @@ def update_cf_dns(ip):
     return f"✅ DNS 更新成功\n**新 IP**: `{ip}`" if res.status_code == 200 else "❌ DNS 更新失败"
 
 def push_to_wechat(content):
-    if not QY_WEBHOOK:
-        print("⚠️ 未配置 Webhook 地址")
-        return
-    
-    # 构建企业微信专用的 Markdown 消息
+    webhook = os.environ.get("QY_WEBHOOK") or QY_WEBHOOK
+    if not webhook: return
+
+    # 降级为最基础的文本模式，测试微信兼容性
     data = {
-        "msgtype": "markdown",
-        "markdown": {
-            "content": f"### 🚀 Cloudflare IP 优选报告\n**执行时间**: {time.strftime('%Y-%m-%d %H:%M')}\n\n**运行结果**:\n{content}"
+        "msgtype": "text",
+        "text": {
+            "content": f"🚀 IP优选更新成功！\n最新运行结果：\n{content}"
         }
     }
-    requests.post(QY_WEBHOOK, json=data)
+    requests.post(webhook, json=data)
 
 def main():
     ip_str = get_cf_speed_test_ip()
