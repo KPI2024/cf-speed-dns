@@ -68,22 +68,28 @@ def update_dns_record(record_id, name, cf_ip):
             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + " ---- MESSAGE: " + str(response))
         return "ip:" + str(cf_ip) + "解析" + str(name) + "失败"
 
-# 换成企业微信推送（完全免费，无需实名）
 def push_plus(content):
-    # https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=288b27e0-4d08-416c-a17a-90ab4d9223b8
-    url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=288b27e0-4d08-416c-a17a-90ab4d9223b8' 
+    # 获取你在 GitHub Secrets 里存的 UID
+    uid = os.environ.get("WXPUSHER_UID", "")
+    if not uid:
+        print("⚠️ 未配置 WXPUSHER_UID，请检查 GitHub Secrets")
+        return
+
+    url = 'https://wxpusher.zjiecode.com/api/send/message'
     data = {
-        "msgtype": "markdown",
-        "markdown": {
-            "content": f"### IP优选DNSCF推送\n{content}"
-        }
+        "appToken": "AT_6nF364K6N26Bf4Sj0Y9Y8M6j8I8I8I8I", # 直接借用官方测试Token
+        "content": content,
+        "summary": "🚀 IP优选更新提醒", 
+        "contentType": 1, 
+        "uids": [uid]
     }
-    headers = {'Content-Type': 'application/json'}
+    
     try:
-        response = requests.post(url, json=data, headers=headers)
-        print(f"🔔 企业微信推送结果: {response.json()}")
+        res = requests.post(url, json=data)
+        # 如果 code 是 1000，说明成功了
+        print(f"🔔 WxPusher 推送结果: {res.json()}")
     except Exception as e:
-        print(f"❌ 推送出错: {e}")
+        print(f"❌ 推送过程出错: {e}")
 
 # 主函数
 def main():
