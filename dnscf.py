@@ -68,26 +68,22 @@ def update_dns_record(record_id, name, cf_ip):
             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + " ---- MESSAGE: " + str(response))
         return "ip:" + str(cf_ip) + "解析" + str(name) + "失败"
 
-# 消息推送（增加结果打印版）
+# 换成企业微信推送（完全免费，无需实名）
 def push_plus(content):
-    url = 'http://www.pushplus.plus/send'
+    # https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=288b27e0-4d08-416c-a17a-90ab4d9223b8
+    url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=288b27e0-4d08-416c-a17a-90ab4d9223b8' 
     data = {
-        "token": PUSHPLUS_TOKEN,
-        "title": "IP优选DNSCF推送",
-        "content": content,
-        "template": "markdown",
-        "channel": "wechat"
+        "msgtype": "markdown",
+        "markdown": {
+            "content": f"### IP优选DNSCF推送\n{content}"
+        }
     }
-    body = json.dumps(data).encode(encoding='utf-8')
     headers = {'Content-Type': 'application/json'}
-    
-    # 修改这里：获取返回结果并打印
     try:
-        response = requests.post(url, data=body, headers=headers)
-        result = response.json()
-        print(f"🔔 PushPlus 推送结果: {result}")
+        response = requests.post(url, json=data, headers=headers)
+        print(f"🔔 企业微信推送结果: {response.json()}")
     except Exception as e:
-        print(f"❌ 推送过程发生错误: {e}")
+        print(f"❌ 推送出错: {e}")
 
 # 主函数
 def main():
