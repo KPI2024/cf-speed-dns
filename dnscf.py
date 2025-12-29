@@ -87,6 +87,12 @@ def main():
     # 获取最新优选IP
     ip_addresses_str = get_cf_speed_test_ip()
     ip_addresses = ip_addresses_str.split(',')
+    if not dns_records:
+    print(f"❌ 错误：在 Cloudflare 中没找到域名 {CF_DNS_NAME} 的记录！")
+    print("请检查：1. Cloudflare是否有该记录  2. Secrets里的域名是否填错")
+    import sys
+    sys.exit(0) # 优雅退出，不让 Actions 变红
+# -------------------------
     dns_records = get_dns_records(CF_DNS_NAME)
     push_plus_content = []
     # 遍历 IP 地址列表
