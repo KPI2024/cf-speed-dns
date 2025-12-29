@@ -68,7 +68,7 @@ def update_dns_record(record_id, name, cf_ip):
             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())) + " ---- MESSAGE: " + str(response))
         return "ip:" + str(cf_ip) + "解析" + str(name) + "失败"
 
-# 消息推送
+# 消息推送（增加结果打印版）
 def push_plus(content):
     url = 'http://www.pushplus.plus/send'
     data = {
@@ -80,7 +80,14 @@ def push_plus(content):
     }
     body = json.dumps(data).encode(encoding='utf-8')
     headers = {'Content-Type': 'application/json'}
-    requests.post(url, data=body, headers=headers)
+    
+    # 修改这里：获取返回结果并打印
+    try:
+        response = requests.post(url, data=body, headers=headers)
+        result = response.json()
+        print(f"🔔 PushPlus 推送结果: {result}")
+    except Exception as e:
+        print(f"❌ 推送过程发生错误: {e}")
 
 # 主函数
 def main():
